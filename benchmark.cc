@@ -11,7 +11,7 @@
 #include "benchmarks/benchmark_ibtree.h"
 #include "benchmarks/benchmark_pgm.h"
 #include "benchmarks/benchmark_rbs.h"
-#include "benchmarks/benchmark_rmi.h"
+//#include "benchmarks/benchmark_rmi.h"
 #include "benchmarks/benchmark_rmi_alt.h"
 #include "benchmarks/benchmark_rs.h"
 #include "benchmarks/benchmark_ts.h"
@@ -49,7 +49,7 @@ template <class Benchmark>
 void execute_32_bit(Benchmark benchmark, bool pareto, bool only_mode,
                     std::string only, std::string filename) {
   // Build and probe individual indexes.
-  check_only("RMI", benchmark_32_rmi(benchmark, pareto, filename));
+  //check_only("RMI", benchmark_32_rmi(benchmark, pareto, filename));
   check_only("RS", benchmark_32_rs(benchmark, pareto));
   check_only("TS", benchmark_32_ts(benchmark, pareto));
   check_only("PGM", benchmark_32_pgm(benchmark, pareto));
@@ -78,7 +78,7 @@ template <class Benchmark>
 void execute_64_bit(Benchmark benchmark, bool pareto, bool only_mode,
                     std::string only, std::string filename) {
   // Build and probe individual indexes.
-  check_only("RMI", benchmark_64_rmi(benchmark, pareto, filename));
+  // check_only("RMI", benchmark_64_rmi(benchmark, pareto, filename));
   check_only("RS", benchmark_64_rs(benchmark, pareto));
   check_only("TS", benchmark_64_ts(benchmark, pareto));
   check_only("PGM", benchmark_64_pgm(benchmark, pareto));
