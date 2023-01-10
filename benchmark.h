@@ -365,7 +365,7 @@ class Benchmark {
       std::cout << "Index varianct: " << index.variant() << std::endl;
       std::cout << "Build time: " << build_ns_ << " ns" << std::endl;
       std::cout << "Average lookup time: " << ns_lookup << " ns" << std::endl;
-      std::cout << "Index size: " << index.size() << std::endl;
+      std::cout << "Index size: " << index.size() << " bytes" << std::endl;
       std::cout << "Searcher: " << searcher_.name() << std::endl;
     }
     if (csv_) {
