@@ -12,6 +12,7 @@
 #include "benchmarks/benchmark_pgm.h"
 #include "benchmarks/benchmark_rbs.h"
 //#include "benchmarks/benchmark_rmi.h"
+#include "benchmarks/benchmark_prefixbtree.h"
 #include "benchmarks/benchmark_rmi_alt.h"
 #include "benchmarks/benchmark_rs.h"
 #include "benchmarks/benchmark_ts.h"
@@ -108,6 +109,7 @@ void execute_str(Benchmark benchmark, bool pareto, bool only_mode,
                  std::string only, std::string filename) {
   // check_only("")
   std::cout << "Execute string index " << std::endl;
+  check_only("PrefixBtree", benchmark_str_prefixbtree(benchmark, pareto));
 }
 
 int main(int argc, char* argv[]) {
@@ -198,8 +200,8 @@ int main(int argc, char* argv[]) {
         add_search_type("branchless_binary", execute_32_bit, uint32_t,
                         BranchlessBinarySearch);
         add_search_type("linear", execute_32_bit, uint32_t, LinearSearch);
-        add_search_type("interpolation", execute_32_bit, uint32_t,
-                        InterpolationSearch);
+        // add_search_type("interpolation", execute_32_bit, uint32_t,
+        //                 InterpolationSearch);
       }
 
       break;
@@ -215,8 +217,8 @@ int main(int argc, char* argv[]) {
         add_search_type("branchless_binary", execute_64_bit, uint64_t,
                         BranchlessBinarySearch);
         add_search_type("linear", execute_64_bit, uint64_t, LinearSearch);
-        add_search_type("interpolation", execute_64_bit, uint64_t,
-                        InterpolationSearch);
+        // add_search_type("interpolation", execute_64_bit, uint64_t,
+        //                 InterpolationSearch);
       }
       break;
     }

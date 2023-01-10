@@ -244,7 +244,7 @@ class Benchmark {
 
     for (unsigned int idx = start; idx < limit; ++idx) {
       // Compute the actual index for debugging.
-      const volatile uint64_t lookup_key = lookups_[idx].key;
+      const KeyType lookup_key = lookups_[idx].key;
       const volatile uint64_t expected = lookups_[idx].result;
 
       if constexpr (clear_cache) {
@@ -303,7 +303,8 @@ class Benchmark {
 
     SearchBound bound = {};
     for (unsigned int idx = 0; idx < lookups_.size(); ++idx) {
-      const volatile uint64_t lookup_key = lookups_[idx].key;
+      // const volatile KeyType lookup_key = lookups_[idx].key;
+      const KeyType lookup_key = lookups_[idx].key;
 
       bound = index.EqualityLookup(lookup_key);
       if (bound.start != bound.stop) {

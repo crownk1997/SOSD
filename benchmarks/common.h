@@ -15,9 +15,9 @@
   template void func_name<BranchingBinarySearch>(                 \
       sosd::Benchmark<type_name, BranchingBinarySearch>&, bool);  \
   template void func_name<BranchlessBinarySearch>(                \
-      sosd::Benchmark<type_name, BranchlessBinarySearch>&, bool); \
-  template void func_name<InterpolationSearch>(                   \
-      sosd::Benchmark<type_name, InterpolationSearch>&, bool)
+      sosd::Benchmark<type_name, BranchlessBinarySearch>&, bool); 
+//   template void func_name<InterpolationSearch>(                   \
+//       sosd::Benchmark<type_name, InterpolationSearch>&, bool)
 #endif
 
 #ifdef FAST_MODE
