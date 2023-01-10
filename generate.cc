@@ -76,6 +76,48 @@ vector<EqualityLookup<KeyType>> generate_equality_lookups(
   return lookups;
 }
 
+template <>
+vector<EqualityLookup<std::string>> generate_equality_lookups(
+    const vector<Row<std::string>>& data, const vector<std::string>& unique_keys,
+    const size_t num_lookups, const double negative_lookup_ratio) {
+  vector<EqualityLookup<std::string>> lookups;
+  lookups.reserve(num_lookups);
+  util::FastRandom ranny(42);
+  size_t num_generated = 0;
+  size_t num_retries = 0;
+  BranchingBinarySearch<std::string> bbs;
+
+  // Required to generate negative lookups within data domain.
+  const std::string min_key = data.front().key;
+  const std::string max_key = data.back().key;
+
+  while (num_generated < num_lookups) {
+    // Generate positive lookup.
+
+    // Draw lookup key from unique keys.
+    const uint64_t offset = ranny.RandUint32(0, unique_keys.size() - 1);
+    const std::string lookup_key = unique_keys[offset];
+
+    // Perform binary search on original keys.
+    size_t num_qualifying;
+    const uint64_t result =
+        bbs.search(data, lookup_key, &num_qualifying, 0, data.size());
+
+    if (num_qualifying > max_num_qualifying) {
+      // Too many qualifying entries.
+      ++num_retries;
+      if (num_retries > max_num_retries)
+        util::fail("generate_equality_lookups: exceeded max number of retries");
+      // Try a different lookup key.
+      continue;
+    }
+    lookups.push_back({lookup_key, result});
+    ++num_generated;
+    num_retries = 0;
+  }
+  return lookups;
+}
+
 template <class KeyType>
 vector<EqualityLookup<KeyType>> generate_equality_lookups_from_trace(
     const vector<Row<KeyType>>& data, const vector<KeyType> keys) {
@@ -203,6 +245,26 @@ int main(int argc, char* argv[]) {
       util::write_data(equality_lookups, filename + "_equality_lookups_" +
                                              to_nice_number(num_lookups));
 
+      break;
+    }
+
+    case DataType::STRING: {
+      std::vector<std::string> keys;
+      util::load_data_str(filename, keys);
+
+      std::vector<std::string> unique_keys = util::remove_duplicates(keys);
+
+      std::vector<Row<std::string>> data = util::add_values(keys);
+
+      // For string type data, we do not support negative lookup
+      std::vector<EqualityLookup<std::string>> equality_lookups;
+      equality_lookups = generate_equality_lookups(data, unique_keys, num_lookups, negative_lookup_ratio);
+
+      print_equality_lookup_stats(equality_lookups);
+      std::cout << "[WARNING] Current version do not support write query file for string type data!!!" << std::endl;
+      util::write_data_str(equality_lookups, filename + "_equality_lookups_" +
+                                             to_nice_number(num_lookups)); 
+      
       break;
     }
   }

@@ -14,7 +14,7 @@
 
 //#define PRINT_ERRORS
 
-enum DataType { UINT32 = 0, UINT64 = 1 };
+enum DataType { UINT32 = 0, UINT64 = 1, STRING=2 };
 
 template <class KeyType>
 struct KeyValue {
@@ -60,7 +60,9 @@ static void fail(const std::string& message) {
     return DataType::UINT32;
   } else if (suffix == "uint64") {
     return DataType::UINT64;
-  } else {
+  } else if (suffix == "str.txt") {
+    return DataType::STRING;
+  }else {
     std::cerr << "type " << suffix << " not supported" << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -138,6 +140,29 @@ static std::vector<T> load_data(const std::string& filename,
   return data;
 }
 
+static void load_data_str(const std::string& filename, std::vector<std::string>& keys, bool print = true) {
+  const uint64_t ns = util::timing([&] {
+    std::ifstream infile(filename);
+    std::string key;
+    int64_t total_len = 0;
+    int count = 0;
+    while (infile.good()) {
+      infile >> key;
+      keys.push_back(key);
+      total_len += key.length();
+      count++;
+    }
+  });
+
+  const uint64_t ms = ns / 1e6;
+
+  if (print) {
+    std::cout << "read " << keys.size() << " values from " << filename << " in"
+              << ms << " ms (" << static_cast<double>(keys.size()) / 1000 / ms
+              << " M values/s)" << std::endl; 
+  }
+}
+
 // Writes values from vector into binary file.
 template <typename T>
 static void write_data(const std::vector<T>& data, const std::string& filename,
@@ -155,6 +180,32 @@ static void write_data(const std::vector<T>& data, const std::string& filename,
     out.write(reinterpret_cast<const char*>(data.data()), size * sizeof(T));
     out.close();
   });
+  const uint64_t ms = ns / 1e6;
+  if (print) {
+    std::cout << "wrote " << data.size() << " values to " << filename << " in "
+              << ms << " ms (" << static_cast<double>(data.size()) / 1000 / ms
+              << " M values/s)" << std::endl;
+  }
+}
+
+static void write_data_str(const std::vector<EqualityLookup<std::string>>& data, const std::string& filename,
+                           const bool print = true) {
+  const uint64_t ns = util::timing([&] {
+    std::ofstream out(filename);
+    if (!out.is_open()) {
+      std::cerr << "unable to open " << filename << std::endl;
+      exit(EXIT_FAILURE); 
+    }
+
+    // write line by line for key and payload
+    for (int i = 0; i < data.size(); i++) {
+      out << data[i].key << "\n";
+      out << data[i].result << "\n";
+    }
+
+    out.close();
+  });
+
   const uint64_t ms = ns / 1e6;
   if (print) {
     std::cout << "wrote " << data.size() << " values to " << filename << " in "
