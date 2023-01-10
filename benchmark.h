@@ -284,6 +284,9 @@ class Benchmark {
         }
         if (result != expected) {
           run_failed = true;
+          std::cerr << "[ERROR] Failed to find the correct results!" << std::endl;
+          std::cerr << "Lookup key is " << lookup_key << std::endl;
+          std::cerr << "Found key is " << iter->key << std::endl;
           return;
         }
       }
@@ -345,18 +348,25 @@ class Benchmark {
 
     // print main results
     std::ostringstream all_times;
+    double ns_lookup = 0;
     for (unsigned int i = 0; i < runs_.size(); ++i) {
       const double ns_per_lookup =
           static_cast<double>(runs_[i]) / lookups_.size();
+      ns_lookup += ns_per_lookup;
       all_times << "," << ns_per_lookup;
     }
 
+    ns_lookup /= runs_.size();
+
     // don't print a line if (the first) run failed
     if (runs_[0] != 0) {
-      std::cout << "RESULT: " << index.name() << "," << index.variant()
-                << all_times.str()  // has a leading comma
-                << "," << index.size() << "," << build_ns_ << ","
-                << searcher_.name() << std::endl;
+      std::cout << "========== Result ==========" << std::endl;
+      std::cout << "Index name: " << index.name() << std::endl;
+      std::cout << "Index varianct: " << index.variant() << std::endl;
+      std::cout << "Build time: " << build_ns_ << " ns" << std::endl;
+      std::cout << "Average lookup time: " << ns_lookup << " ns" << std::endl;
+      std::cout << "Index size: " << index.size() << std::endl;
+      std::cout << "Searcher: " << searcher_.name() << std::endl;
     }
     if (csv_) {
       PrintResultCSV(index);

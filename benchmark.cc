@@ -108,7 +108,6 @@ template <class Benchmark>
 void execute_str(Benchmark benchmark, bool pareto, bool only_mode,
                  std::string only, std::string filename) {
   // check_only("")
-  std::cout << "Execute string index " << std::endl;
   check_only("PrefixBtree", benchmark_str_prefixbtree(benchmark, pareto));
 }
 
