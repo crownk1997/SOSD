@@ -64,8 +64,13 @@ class Benchmark {
         dataset_name_.begin(),
         dataset_name_.begin() + dataset_name_.find(prefix) + strlen(prefix));
 
-    // Load data.
-    std::vector<KeyType> keys = util::load_data<KeyType>(data_filename_);
+    // Load data, if string type we use different functions
+    std::vector<KeyType> keys;
+    if constexpr (std::is_same<KeyType, std::string>::value) {
+      util::load_data_str(data_filename, keys);
+    } else {
+      keys = util::load_data<KeyType>(data_filename_);
+    }
 
     log_sum_search_bound_ = 0.0;
     l1_sum_search_bound_ = 0.0;
@@ -80,8 +85,13 @@ class Benchmark {
       std::cout << "data contains duplicates" << std::endl;
     // Add artificial values to keys.
     data_ = util::add_values(keys);
-    // Load lookups.
-    lookups_ = util::load_data<EqualityLookup<KeyType>>(lookups_filename_);
+
+    // Load lookups. If string type we use different functions
+    if constexpr (std::is_same<KeyType, std::string>::value) {
+      util::load_lookup_str(lookups_filename_, lookups_); 
+    } else {
+      lookups_ = util::load_data<EqualityLookup<KeyType>>(lookups_filename_);
+    }
 
     // Create the data for the index (key -> position).
     for (uint64_t pos = 0; pos < data_.size(); pos++) {

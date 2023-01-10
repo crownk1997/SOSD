@@ -103,6 +103,13 @@ void execute_64_bit(Benchmark benchmark, bool pareto, bool only_mode,
   }
 }
 
+template <class Benchmark>
+void execute_str(Benchmark benchmark, bool pareto, bool only_mode,
+                 std::string only, std::string filename) {
+  // check_only("")
+  std::cout << "Execute string index " << std::endl;
+}
+
 int main(int argc, char* argv[]) {
   cxxopts::Options options("benchmark", "Searching on sorted data benchmark");
   options.positional_help("<data> <lookups>");
@@ -212,6 +219,9 @@ int main(int argc, char* argv[]) {
                         InterpolationSearch);
       }
       break;
+    }
+    case DataType::STRING: {
+      add_search_type("binary", execute_str, std::string, BranchingBinarySearch);
     }
   }
 

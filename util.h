@@ -163,6 +163,32 @@ static void load_data_str(const std::string& filename, std::vector<std::string>&
   }
 }
 
+static void load_lookup_str(const std::string& filename, 
+                            std::vector<EqualityLookup<std::string>>& data, bool print = true) {
+  const uint64_t ns = util::timing([&] {
+    std::ifstream infile(filename);
+    if (!infile.is_open()) {
+      std::cerr << "Unable to open " << filename << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    EqualityLookup<std::string> kv_pair;
+
+    while (infile.good()) {
+      infile >> kv_pair.key;
+      infile >> kv_pair.result;
+      data.push_back(kv_pair);
+    }
+  });
+
+  const uint64_t ms = ns / 1e6;
+
+  if (print) {
+    std::cout << "read " << data.size() << " values from " << filename << " in"
+              << ms << " ms (" << static_cast<double>(data.size()) / 1000 / ms
+              << " M values/s)" << std::endl; 
+  } 
+}
+
 // Writes values from vector into binary file.
 template <typename T>
 static void write_data(const std::vector<T>& data, const std::string& filename,
