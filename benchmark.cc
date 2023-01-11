@@ -38,7 +38,7 @@ using namespace std;
     if (search_type == (name)) {                                          \
       auto search = search_class<type>();                                 \
       sosd::Benchmark<type, search_class> benchmark(                      \
-          filename, lookups, num_repeats, perf, build, fence, cold_cache, \
+          filename, lookups, num_repeats, bulk_load, perf, build, fence, cold_cache, \
           track_errors, csv, num_threads, search);                        \
       func(benchmark, pareto, only_mode, only, filename);                 \
       found_search_type = true;                                           \
@@ -135,6 +135,7 @@ int main(int argc, char* argv[]) {
       "Specify a search type, one of: binary, branchless_binary, linear, "
       "interpolation",
       cxxopts::value<std::string>()->default_value("binary"))(
+        "bulk_load", "Whether build index with bulk load")(
       "positional", "extra positional arguments",
       cxxopts::value<std::vector<std::string>>());
 
@@ -153,6 +154,7 @@ int main(int argc, char* argv[]) {
   const size_t num_threads = result["threads"].as<int>();
   cout << "Using " << num_threads << " thread(s)." << endl;
 
+  const bool bulk_load = result.count("bulk_load");
   const bool perf = result.count("perf");
   const bool build = result.count("build");
   const bool fence = result.count("fence");

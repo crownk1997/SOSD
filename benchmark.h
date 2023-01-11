@@ -37,13 +37,14 @@ template <typename KeyType = uint64_t,
 class Benchmark {
  public:
   Benchmark(const std::string& data_filename,
-            const std::string& lookups_filename, const size_t num_repeats,
+            const std::string& lookups_filename, const size_t num_repeats, const bool bulk_load,
             const bool perf, const bool build, const bool fence,
             const bool cold_cache, const bool track_errors, const bool csv,
             const size_t num_threads, const SearchClass<KeyType> searcher)
       : data_filename_(data_filename),
         lookups_filename_(lookups_filename),
         num_repeats_(num_repeats),
+        bulk_load_(bulk_load),
         first_run_(true),
         perf_(perf),
         build_(build),
@@ -118,6 +119,7 @@ class Benchmark {
       return;
     }
 
+    // TODO: Change the interface for each competitor
     build_ns_ = index.Build(index_data_);
 
     // Do equality lookups.
@@ -363,7 +365,7 @@ class Benchmark {
       std::cout << "========== Result ==========" << std::endl;
       std::cout << "Index name: " << index.name() << std::endl;
       std::cout << "Index varianct: " << index.variant() << std::endl;
-      std::cout << "Build time: " << build_ns_ << " ns" << std::endl;
+      std::cout << "Average build time: " << build_ns_ / index_data_.size() << " ns" << std::endl;
       std::cout << "Average lookup time: " << ns_lookup << " ns" << std::endl;
       std::cout << "Index size: " << index.size() << " bytes" << std::endl;
       std::cout << "Searcher: " << searcher_.name() << std::endl;
@@ -452,6 +454,7 @@ class Benchmark {
   // Number of times we repeat the lookup code.
   size_t num_repeats_;
   // Used to only print profiling header information for first run.
+  bool bulk_load_;
   bool first_run_;
   bool perf_;
   bool build_;
